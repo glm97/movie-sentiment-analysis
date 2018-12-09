@@ -2,6 +2,7 @@ from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 import json
+import naiveBayes as nb
 
 #consumer key, consumer secret, access token, access secret.
 ckey="lQF2T05PqyUFJ3Hf20NQNGpMq"
@@ -14,6 +15,18 @@ class listener(StreamListener):
     def on_data(self, data):
         all_data = json.loads(data)
         tweet = all_data["text"]
+        sentiment_value, confidence = nb.sentiment(tweet)
+        print(tweet, sentiment_value, confidence)
+        if confidence*100 >= 80:
+            tweetsOut = open("twitter-out.txt","a")
+            tweetsOut.write(tweet)
+            tweetsOut.write('\n')
+            tweetsOut.close()
+
+            confidenceOut = open("twitter-confidence.txt","a")
+            confidenceOut.write(sentiment_value)
+            confidenceOut.write('\n')
+            confidenceOut.close()
         print(tweet)
         return(True)
 
