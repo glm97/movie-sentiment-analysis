@@ -18,12 +18,12 @@ class listener(StreamListener):
         sentiment_value, confidence = nb.sentiment(tweet)
         print(tweet, sentiment_value, confidence)
         if confidence*100 >= 80:
-            tweetsOut = open("twitter-out.txt","a")
+            tweetsOut = open("twitter-out.txt","a", encoding='utf-8')
             tweetsOut.write(tweet)
             tweetsOut.write('\n')
             tweetsOut.close()
 
-            confidenceOut = open("twitter-confidence.txt","a")
+            confidenceOut = open("twitter-confidence.txt","a", encoding='utf-8')
             confidenceOut.write(sentiment_value)
             confidenceOut.write('\n')
             confidenceOut.close()
