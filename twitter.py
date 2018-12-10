@@ -16,7 +16,7 @@ class listener(StreamListener):
         all_data = json.loads(data)
         tweet = all_data["text"]
         sentiment_value, confidence = nb.sentiment(tweet)
-        print(tweet, sentiment_value, confidence)
+        print(tweet,'\n', sentiment_value,'\n', confidence)
         if confidence*100 >= 80:
             tweetsOut = open("twitter-out.txt","a", encoding='utf-8')
             tweetsOut.write(tweet)
@@ -27,7 +27,6 @@ class listener(StreamListener):
             confidenceOut.write(sentiment_value)
             confidenceOut.write('\n')
             confidenceOut.close()
-        print(tweet)
         return(True)
 
     def on_error(self, status):

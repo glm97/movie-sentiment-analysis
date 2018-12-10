@@ -18,7 +18,7 @@ def animate(i):
     x = 0
     y = 0
 
-    for l in lines[-200:]:
+    for l in lines[-50:]:
         x += 1
         if "pos" in l:
             y += 1
