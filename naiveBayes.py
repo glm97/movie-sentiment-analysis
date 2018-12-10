@@ -33,8 +33,6 @@ class VoteClassifier (ClassifierI):
         conf = choice_votes / len(votes)
         return conf
     
-short_pos = open("short_reviews/positive.txt","r").read()
-short_neg = open("short_reviews/negative.txt","r").read()
 
 print("File reading DONE")
 
@@ -45,37 +43,8 @@ allowed_word_types = ["J", "R"]
 short_pos_words = []
 short_neg_words = []
 
-for p in short_pos.split('\n'):
-    documents.append( (p, "pos") )
-    words = word_tokenize(p)
-    pos = nltk.pos_tag(words)
-    chunkParser = nltk.RegexpParser(chunkGram)
-    chunked = chunkParser.parse(pos)
-    for node in chunked.subtrees(filter=lambda t: t.label() == 'Chunk'):
-        for a in node.leaves():
-            if a[1][0] in allowed_word_types:                
-                short_pos_words.append(a[0].lower())
 
-for n in short_neg.split('\n'):
-    documents.append( (n, "neg") )
-    words = word_tokenize(n)
-    neg = nltk.pos_tag(words)
-    chunkParser = nltk.RegexpParser(chunkGram)
-    chunked = chunkParser.parse(neg)
-    for node in chunked.subtrees(filter=lambda t: t.label() == 'Chunk'):
-        for a in node.leaves():
-            if a[1][0] in allowed_word_types:
-                short_neg_words.append(a[0].lower())
 
-for w in short_pos_words:
-    all_words.append(w.lower())
-
-for w in short_neg_words:
-    all_words.append(w.lower())
-
-all_words = nltk.FreqDist(all_words)
-
-word_features = list(all_words.keys())[:5000]
 
 print("File pre processing DONE")
 
@@ -91,6 +60,43 @@ def find_features(document):
 print("Searching for models...")
 if not(os.path.isfile('./NuSVC.sav')):
     print("Models not found!!!")
+
+    short_pos = open("short_reviews/positive.txt","r").read()
+    short_neg = open("short_reviews/negative.txt","r").read()
+
+    for p in short_pos.split('\n'):
+        documents.append( (p, "pos") )
+        words = word_tokenize(p)
+        pos = nltk.pos_tag(words)
+        chunkParser = nltk.RegexpParser(chunkGram)
+        chunked = chunkParser.parse(pos)
+        for node in chunked.subtrees(filter=lambda t: t.label() == 'Chunk'):
+            for a in node.leaves():
+                if a[1][0] in allowed_word_types:                
+                    short_pos_words.append(a[0].lower())
+
+    for n in short_neg.split('\n'):
+        documents.append( (n, "neg") )
+        words = word_tokenize(n)
+        neg = nltk.pos_tag(words)
+        chunkParser = nltk.RegexpParser(chunkGram)
+        chunked = chunkParser.parse(neg)
+        for node in chunked.subtrees(filter=lambda t: t.label() == 'Chunk'):
+            for a in node.leaves():
+                if a[1][0] in allowed_word_types:
+                    short_neg_words.append(a[0].lower())
+
+    for w in short_pos_words:
+        all_words.append(w.lower())
+
+    for w in short_neg_words:
+        all_words.append(w.lower())
+
+    all_words = nltk.FreqDist(all_words)
+
+    word_features = list(all_words.keys())[:5000]
+
+
     featuresets = [(find_features(rev), category) for (rev, category) in documents]
 
     random.shuffle(featuresets)
@@ -162,7 +168,7 @@ if not(os.path.isfile('./NuSVC.sav')):
     ##print("Classification:", voted_classifier.classify(testing_set[4][0]), "Confidence %:", voted_classifier.confidence(testing_set[4][0]))
 else:
     print("Models Founded!!!")
-    print("Loading models...")
+    print("Loading...")
     classifier = pickle.load(open('NaiveBayesModel.sav', 'rb'))
     print("Bayes Loaded")
     MNB_classifier = pickle.load(open('MNB.sav', 'rb'))
