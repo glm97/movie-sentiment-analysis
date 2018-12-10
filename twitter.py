@@ -3,7 +3,6 @@ from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 import json
 import naiveBayes as nb
-import liveplot as lv
 import tkinter as tk
 from tkinter import *
 
@@ -18,7 +17,8 @@ class listener(StreamListener):
     def on_data(self, data):
         all_data = json.loads(data)
         tweet = all_data["text"]
-        sentiment_value, confidence = nb.sentiment(tweet)
+        sentiment_value = nb.sentiment(tweet)[0]
+        confidence = nb.sentiment(tweet)[1]
         print(tweet, sentiment_value, confidence)
         if confidence*100 >= 80:
             tweetsOut = open("twitter-out.txt","a", encoding='utf-8')
@@ -26,8 +26,8 @@ class listener(StreamListener):
             tweetsOut.write('\n')
             tweetsOut.close()
 
-            confidenceOut = open("twitter-confidence.txt","a", encoding='utf-8')
-            confidenceOut.write(sentiment_value)
+            confidenceOut = open("twitter-confidence.txt","a")
+            confidenceOut.write((sentiment_value,confidence))
             confidenceOut.write('\n')
             confidenceOut.close()
         print(tweet)
@@ -43,8 +43,8 @@ twitterStream = Stream(auth, listener())
 #twitterStream.filter(track=["Avengers"])
 
 def button_click():
-    # função que usa o texto de entrada para filtrar twitts
-    twitterStream.filter(track=[ed.get()])
+    # função que usa o texto de entrada para filtrar tweets
+    twitterStream.filter(track=[str(ed.get())])
 
 
 janela = tk.Tk()
@@ -68,7 +68,7 @@ janela.title('Janela Inicial')
 janela['background'] = 'light blue'
 
 # dimensoes
-#Largura X altura + Distancia a esq do video + distancia do topo
+# Largura X altura + Distancia a esq do video + distancia do topo
 # 300 x 300 + 100 + 100
 janela.geometry('300x300+100+100')
 
