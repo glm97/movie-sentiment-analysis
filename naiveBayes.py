@@ -9,6 +9,7 @@ from sklearn.svm import SVC, LinearSVC, NuSVC
 from nltk.classify import ClassifierI
 from statistics import mode
 from nltk.tokenize import word_tokenize
+import os.path
 
 print("Imports DONE")
 
@@ -87,70 +88,103 @@ def find_features(document):
     return features
 	
 #print((find_features(movie_reviews.words('neg/cv000_29416.txt'))))
+print("Searching for models...")
+if not(os.path.isfile('./NuSVC.sav')):
+    print("Models not found!!!")
+    featuresets = [(find_features(rev), category) for (rev, category) in documents]
 
-featuresets = [(find_features(rev), category) for (rev, category) in documents]
+    random.shuffle(featuresets)
 
-random.shuffle(featuresets)
-
-# positive data example:      
-training_set = featuresets[:10000]
-testing_set =  featuresets[10000:]
-print("Shuffle DONE")
-##
-### negative data example:      
-##training_set = featuresets[100:]
-##testing_set =  featuresets[:100]
+    # positive data example:      
+    training_set = featuresets[:10000]
+    testing_set =  featuresets[10000:]
+    print("Shuffle DONE")
+    ##
+    ### negative data example:      
+    ##training_set = featuresets[100:]
+    ##testing_set =  featuresets[:100]
 
 
-classifier = nltk.NaiveBayesClassifier.train(training_set)
-print("Original Naive Bayes accuracy:", (nltk.classify.accuracy(classifier, testing_set))*100)
-classifier.show_most_informative_features(15)
+    classifier = nltk.NaiveBayesClassifier.train(training_set)
+    print("Original Naive Bayes accuracy:", (nltk.classify.accuracy(classifier, testing_set))*100)
+    classifier.show_most_informative_features(15)
+    pickle.dump(classifier, open('NaiveBayesModel.sav', 'wb'))
 
-print("NB DONE")
+    print("NB DONE")
 
-MNB_classifier = SklearnClassifier(MultinomialNB())
-MNB_classifier.train(training_set)
-print("MultinomialNB accuracy percent:", (nltk.classify.accuracy(MNB_classifier, testing_set)*100))
+    MNB_classifier = SklearnClassifier(MultinomialNB())
+    MNB_classifier.train(training_set)
+    pickle.dump(classifier, open('MNB.sav', 'wb'))
+    print("MultinomialNB accuracy percent:", (nltk.classify.accuracy(MNB_classifier, testing_set)*100))
 
-print("Multi DONE")
+    print("Multi DONE")
 
-BNB_classifier = SklearnClassifier(BernoulliNB())
-BNB_classifier.train(training_set)
-print("BernoulliNB accuracy percent:",(nltk.classify.accuracy(BNB_classifier, testing_set)*100))
+    BNB_classifier = SklearnClassifier(BernoulliNB())
+    BNB_classifier.train(training_set)
+    pickle.dump(classifier, open('BNB.sav', 'wb'))
+    print("BernoulliNB accuracy percent:",(nltk.classify.accuracy(BNB_classifier, testing_set)*100))
 
-print("Bernouli DONE")
+    print("Bernouli DONE")
 
-LogisticRegression_classifier = SklearnClassifier(LogisticRegression())
-LogisticRegression_classifier.train(training_set)
-print("LogisticRegression accuracy percent:",(nltk.classify.accuracy(LogisticRegression_classifier, testing_set)*100))
+    LogisticRegression_classifier = SklearnClassifier(LogisticRegression())
+    LogisticRegression_classifier.train(training_set)
+    pickle.dump(classifier, open('LogReg.sav', 'wb'))
+    print("LogisticRegression accuracy percent:",(nltk.classify.accuracy(LogisticRegression_classifier, testing_set)*100))
 
-SGDClassifier_classifier = SklearnClassifier(SGDClassifier())
-SGDClassifier_classifier.train(training_set)
-print("SGDClassifier accuracy percent:",(nltk.classify.accuracy(SGDClassifier_classifier, testing_set)*100))
+    SGDClassifier_classifier = SklearnClassifier(SGDClassifier())
+    SGDClassifier_classifier.train(training_set)
+    pickle.dump(classifier, open('SGDC.sav', 'wb'))
+    print("SGDClassifier accuracy percent:",(nltk.classify.accuracy(SGDClassifier_classifier, testing_set)*100))
 
-LinearSVC_classifier = SklearnClassifier(LinearSVC())
-LinearSVC_classifier.train(training_set)
-print("LinearSVC accuracy percent:",(nltk.classify.accuracy(LinearSVC_classifier, testing_set)*100))
+    LinearSVC_classifier = SklearnClassifier(LinearSVC())
+    LinearSVC_classifier.train(training_set)
+    pickle.dump(classifier, open('LinearSVC.sav', 'wb'))
+    print("LinearSVC accuracy percent:",(nltk.classify.accuracy(LinearSVC_classifier, testing_set)*100))
 
-NuSVC_classifier = SklearnClassifier(NuSVC())
-NuSVC_classifier.train(training_set)
-print("NuSVC accuracy percent:",(nltk.classify.accuracy(NuSVC_classifier, testing_set)*100))
+    NuSVC_classifier = SklearnClassifier(NuSVC())
+    NuSVC_classifier.train(training_set)
+    pickle.dump(classifier, open('NuSVC.sav', 'wb'))
+    print("NuSVC accuracy percent:",(nltk.classify.accuracy(NuSVC_classifier, testing_set)*100))
 
-voted_classifier = VoteClassifier(classifier,
-                                  MNB_classifier,
-                                  BNB_classifier,
-                                  LogisticRegression_classifier,
-                                  SGDClassifier_classifier,
-                                  LinearSVC_classifier,
-                                  NuSVC_classifier)
-print("voted_classifier accuracy percent:",(nltk.classify.accuracy(voted_classifier, testing_set)*100))
+    voted_classifier = VoteClassifier(classifier,
+                                    MNB_classifier,
+                                    BNB_classifier,
+                                    LogisticRegression_classifier,
+                                    SGDClassifier_classifier,
+                                    LinearSVC_classifier,
+                                    NuSVC_classifier)
+    print("voted_classifier accuracy percent:",(nltk.classify.accuracy(voted_classifier, testing_set)*100))
 
-##print("Classification:", voted_classifier.classify(testing_set[0][0]), "Confidence %:", voted_classifier.confidence(testing_set[0][0]))
-##print("Classification:", voted_classifier.classify(testing_set[1][0]), "Confidence %:", voted_classifier.confidence(testing_set[1][0]))
-##print("Classification:", voted_classifier.classify(testing_set[2][0]), "Confidence %:", voted_classifier.confidence(testing_set[2][0]))
-##print("Classification:", voted_classifier.classify(testing_set[3][0]), "Confidence %:", voted_classifier.confidence(testing_set[3][0]))
-##print("Classification:", voted_classifier.classify(testing_set[4][0]), "Confidence %:", voted_classifier.confidence(testing_set[4][0]))
-
+    ##print("Classification:", voted_classifier.classify(testing_set[0][0]), "Confidence %:", voted_classifier.confidence(testing_set[0][0]))
+    ##print("Classification:", voted_classifier.classify(testing_set[1][0]), "Confidence %:", voted_classifier.confidence(testing_set[1][0]))
+    ##print("Classification:", voted_classifier.classify(testing_set[2][0]), "Confidence %:", voted_classifier.confidence(testing_set[2][0]))
+    ##print("Classification:", voted_classifier.classify(testing_set[3][0]), "Confidence %:", voted_classifier.confidence(testing_set[3][0]))
+    ##print("Classification:", voted_classifier.classify(testing_set[4][0]), "Confidence %:", voted_classifier.confidence(testing_set[4][0]))
+else:
+    print("Models Founded!!!")
+    print("Loading models...")
+    classifier = pickle.load(open('NaiveBayesModel.sav', 'rb'))
+    print("Bayes Loaded")
+    MNB_classifier = pickle.load(open('MNB.sav', 'rb'))
+    print("MNB Loaded")
+    BNB_classifier = pickle.load(open('BNB.sav', 'rb'))
+    print("BNB Loaded")
+    LogisticRegression_classifier = pickle.load(open('LogReg.sav', 'rb'))
+    print("LogReg Loaded")
+    SGDClassifier_classifier = pickle.load(open('SGDC.sav', 'rb'))
+    print("SGDC Loaded")
+    LinearSVC_classifier = pickle.load(open('LinearSVC.sav', 'rb'))
+    print("LinearSVC Loaded")
+    NuSVC_classifier = pickle.load(open('NuSVC.sav', 'rb'))
+    print("NuSVC Loaded")
+    voted_classifier = VoteClassifier(classifier,
+                                    MNB_classifier,
+                                    BNB_classifier,
+                                    LogisticRegression_classifier,
+                                    SGDClassifier_classifier,
+                                    LinearSVC_classifier,
+                                    NuSVC_classifier)
+    
 def sentiment(text):
     feats = find_features(text)
     return voted_classifier.classify(feats),voted_classifier.confidence(feats)

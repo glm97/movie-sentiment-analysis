@@ -1,12 +1,27 @@
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
+
 import json
-import naiveBayes as nb
+
 import tkinter as tk
 from tkinter import *
 
-#consumer key, consumer secret, access token, access secret.
+#Plots
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib import style
+import time
+
+#Nosso modulos
+import naiveBayes as nb
+import liveplot
+
+#Chaves de acesso
 ckey="lQF2T05PqyUFJ3Hf20NQNGpMq"
 csecret="a5oXiTf4hl6sQfvsyus0DlJUhD8eLRc6yp5fjFWM5bNXgQCTKC"
 atoken="834546034210648064-b3ybwBj2uiIomTXDVZDgXt0Mt0R9Wqn"
@@ -20,10 +35,10 @@ class listener(StreamListener):
         sentiment_value, confidence = nb.sentiment(tweet)
         print(tweet,'\n', sentiment_value,'\n', confidence)
         if confidence*100 >= 80:
-            tweetsOut = open("twitter-out.txt","a", encoding='utf-8')
-            tweetsOut.write(tweet)
-            tweetsOut.write('\n')
-            tweetsOut.close()
+            #tweetsOut = open("twitter-out.txt","a", encoding='utf-8')
+            #tweetsOut.write(tweet)
+            #tweetsOut.write('\n')
+            #tweetsOut.close()
 
             confidenceOut = open("twitter-confidence.txt","a", encoding='utf-8')
             confidenceOut.write(sentiment_value)
@@ -40,9 +55,45 @@ auth.set_access_token(atoken, asecret)
 twitterStream = Stream(auth, listener())
 #twitterStream.filter(track=["Avengers"])
 
+style.use("ggplot")
+f = Figure(figsize=(5,4), dpi=100)
+
+style.use("ggplot")
+ax1 = f.add_subplot(1,1,1)
+print("Fig and Ax1 DONE")
+
+def animate(i):
+    pullData = open("twitter-confidence.txt","r").read()
+    lines = pullData.split('\n')
+
+    xar = []
+    yar = []
+
+    x = 0
+    y = 0
+
+    for l in lines[-50:]:
+        x += 1
+        if "pos" in l:
+            y += 1
+        elif "neg" in l:
+            y -= 1
+        xar.append(x)
+        yar.append(y)
+        
+    ax1.clear()
+    ax1.plot(xar,yar)
+
+
 def button_click():
     # função que usa o texto de entrada para filtrar tweets
     twitterStream.filter(track=[str(ed.get())])
+    canvas = FigureCanvasTkAgg(f, master=janela)
+    canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+    canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+    ani = animation.FuncAnimation(f, animate, interval=1000)
+    
+
 
 
 janela = tk.Tk()
@@ -70,6 +121,5 @@ janela['background'] = 'light blue'
 # 300 x 300 + 100 + 100
 janela.geometry('300x300+100+100')
 
+#canvas = FigureCanvasTkAgg(f, master=janela)
 janela.mainloop()
-
-

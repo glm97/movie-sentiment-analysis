@@ -2,11 +2,12 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
 import time
-
+print("Importings DONE")
 style.use("ggplot")
 
 fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)
+print("Fig and Ax1 DONE")
 
 def animate(i):
     pullData = open("twitter-confidence.txt","r").read()
@@ -24,11 +25,12 @@ def animate(i):
             y += 1
         elif "neg" in l:
             y -= 1
-
         xar.append(x)
         yar.append(y)
         
     ax1.clear()
     ax1.plot(xar,yar)
+print("Animate DONE")
 ani = animation.FuncAnimation(fig, animate, interval=1000)
+
 plt.show()
