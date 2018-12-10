@@ -3,6 +3,8 @@ from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 import json
 import naiveBayes as nb
+import tkinter as tk
+from tkinter import *
 
 #consumer key, consumer secret, access token, access secret.
 ckey="lQF2T05PqyUFJ3Hf20NQNGpMq"
@@ -36,4 +38,38 @@ auth = OAuthHandler(ckey, csecret)
 auth.set_access_token(atoken, asecret)
 
 twitterStream = Stream(auth, listener())
-twitterStream.filter(track=["Avengers"])
+#twitterStream.filter(track=["Avengers"])
+
+def button_click():
+    # função que usa o texto de entrada para filtrar tweets
+    twitterStream.filter(track=[str(ed.get())])
+
+
+janela = tk.Tk()
+
+# label dentro de janela
+lb1 = Label(janela,text= 'Movie Emotions')
+lb1.place(x = 100 , y = 50)
+
+# entrada - Onde usuario coloca o nome do filme
+ed = Entry(janela)
+ed.place(x=50,y=100)
+
+bt = Button(janela,width = 10,text='Emoções!',command = button_click)
+bt.place(x=200,y = 100)
+
+# titulo
+janela.title('Janela Inicial')
+
+# cor de Fundo
+# outro modo de alterar janela['bg'] = 'green'
+janela['background'] = 'light blue'
+
+# dimensoes
+# Largura X altura + Distancia a esq do video + distancia do topo
+# 300 x 300 + 100 + 100
+janela.geometry('300x300+100+100')
+
+janela.mainloop()
+
+
