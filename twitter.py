@@ -52,10 +52,9 @@ class listener(StreamListener):
 auth = OAuthHandler(ckey, csecret)
 auth.set_access_token(atoken, asecret)
 
-twitterStream = Stream(auth, listener())
+
 #twitterStream.filter(track=["Avengers"])
 
-style.use("ggplot")
 f = Figure(figsize=(5,4), dpi=100)
 
 style.use("ggplot")
@@ -87,10 +86,14 @@ def animate(i):
 
 def button_click():
     # função que usa o texto de entrada para filtrar tweets
+    print("Fetching tweets...")
+    twitterStream = Stream(auth, listener())
     twitterStream.filter(track=[str(ed.get())])
+    print("Setting canvas...")
     canvas = FigureCanvasTkAgg(f, master=janela)
     canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
     canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+    canvas = FigureCanvasTkAgg(f, master=janela)
     ani = animation.FuncAnimation(f, animate, interval=1000)
     
 
@@ -121,5 +124,5 @@ janela['background'] = 'light blue'
 # 300 x 300 + 100 + 100
 janela.geometry('300x300+100+100')
 
-#canvas = FigureCanvasTkAgg(f, master=janela)
+
 janela.mainloop()
