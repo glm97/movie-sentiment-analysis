@@ -25,10 +25,10 @@ class listener(StreamListener):
             tweetsOut.write('\n')
             tweetsOut.close()
 
-            #confidenceOut = open("twitter-confidence.txt","a", encoding='utf-8')
-            #confidenceOut.write(sentiment_value)
-            #confidenceOut.write('\n')
-            #confidenceOut.close()
+            confidenceOut = open("twitter-confidence.txt","a", encoding='utf-8')
+            confidenceOut.write(sentiment_value)
+            confidenceOut.write('\n')
+            confidenceOut.close()
         return(True)
 
     def on_error(self, status):
